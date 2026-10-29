@@ -1,0 +1,22 @@
+# Production Readiness Guide: Razorpay Payment Integration (Node.js + React)
+
+This document lists what is required, and what must be changed, before the Razorpay payment feature is deployed to production.
+
+---
+
+## 1. Current State vs. Production Requirement
+
+| Area | Practice Code | Required in Production |
+|---|---|---|
+| Razorpay keys | Test mode keys | Live mode keys, after Razorpay account activation (KYC and business verification) |
+| Transport | HTTP on localhost | HTTPS only |
+| Webhook | Not reachable from the internet | Public HTTPS webhook URL registered in the Razorpay dashboard |
+| Secrets | Plain `.env` file | Host-level environment variables or a secret manager |
+| Fulfilment | Status saved as `paid` only | Business action (access, delivery, invoice) triggered once per payment |
+| Amount check | Signature verified only | Signature plus amount and currency cross-check |
+| Duplicate events | Handled by status check | Handled by event-id deduplication |
+| Stuck orders | Remain `created` forever | Reconciliation job |
+| Refunds | Not implemented | Refund flow with audit trail |
+| Rate limiting | None | Enabled on payment routes |
+| Logging | `console.log` | Structured logs, alerts on payment failures |
+| Legal pages | None | Terms, privacy policy, refund and cancellation policy |
